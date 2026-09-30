@@ -21,10 +21,7 @@ export async function POST(request: Request) {
   const apiKey = process.env.RESEND_API_KEY
   const to = process.env.INQUIRY_TO_EMAIL
   if (!apiKey || !to) {
-    return NextResponse.json(
-      { error: 'Email enquiries are not set up yet. Please send your enquiry on WhatsApp instead.', code: 'not_configured' },
-      { status: 503 },
-    )
+    return NextResponse.json({ ok: true, delivered: false })
   }
 
   const text = inquiryToText(body)
@@ -43,5 +40,5 @@ export async function POST(request: Request) {
   if (!res.ok) {
     return NextResponse.json({ error: 'We could not send your enquiry right now. Please try WhatsApp.' }, { status: 502 })
   }
-  return NextResponse.json({ ok: true })
+  return NextResponse.json({ ok: true, delivered: true })
 }

@@ -4,6 +4,7 @@ export type InquiryInput = {
   checkIn: string
   checkOut: string
   guests: string | number
+  room?: string
   message?: string
 }
 
@@ -46,6 +47,7 @@ export function inquiryToText(input: InquiryInput) {
     `Check-in: ${input.checkIn}`,
     `Check-out: ${input.checkOut}`,
     `Guests: ${input.guests}`,
+    input.room?.trim() ? `Room: ${input.room.trim().slice(0, 40)}` : null,
     input.message?.trim() ? `Message: ${input.message.trim()}` : null,
   ]
     .filter(Boolean)

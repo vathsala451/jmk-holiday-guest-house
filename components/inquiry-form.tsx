@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, Loader2, MessageCircle, AlertCircle } from 'lucide-react'
+import { CheckCircle2, Loader2, MessageCircle, AlertCircle, Send } from 'lucide-react'
 import { inquiryToText, validateInquiry, type InquiryErrors, type InquiryInput } from '@/lib/inquiry'
 import { site, whatsappUrl } from '@/data/site'
 import { cn } from '@/lib/utils'
@@ -9,7 +9,7 @@ import { SectionHeading } from './section-heading'
 
 type Status = 'idle' | 'loading' | 'success' | 'error'
 
-const empty: InquiryInput = { name: '', phone: '', checkIn: '', checkOut: '', guests: '2', message: '' }
+const empty: InquiryInput = { name: '', phone: '', checkIn: '', checkOut: '', guests: '2', room: site.rooms[0]?.name ?? '', message: '' }
 const today = () => new Date().toISOString().slice(0, 10)
 
 export function InquiryForm() {
@@ -19,7 +19,7 @@ export function InquiryForm() {
   const [serverMessage, setServerMessage] = useState('')
   const [sent, setSent] = useState<InquiryInput | null>(null)
 
-  const update = (key: keyof InquiryInput) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const update = (key: keyof InquiryInput) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setValues((v) => ({ ...v, [key]: e.target.value }))
     if (errors[key]) setErrors((er) => ({ ...er, [key]: undefined }))
   }
@@ -49,7 +49,7 @@ export function InquiryForm() {
         setStatus('error')
         return
       }
-      setSent(values)
+      setSent(data.delivered ? null : values)
       setValues(empty)
       setStatus('success')
     } catch {
@@ -59,35 +59,15 @@ export function InquiryForm() {
   }
 
   return (
-    <section id="enquire" aria-labelledby="enquire-title" className="relative z-10 mx-auto max-w-3xl px-4 py-20 sm:px-6">
+    <section id="book" aria-labelledby="book-title" className="relative z-10 mx-auto max-w-3xl scroll-mt-28 px-4 py-20 sm:px-6">
       <SectionHeading
-        id="enquire-title"
-        eyebrow="Enquire"
-        title="Plan your stay"
+        id="book-title"
+        eyebrow="Book / Stay"
+        title="Book your stay"
         intro="Share your dates and we will get back to you with availability."
       />
 
-      {status === 'success' && sent ? (
-        <div role="status" className="mt-10 flex flex-col items-start gap-4 rounded-[2rem] border border-border bg-card p-8">
-          <CheckCircle2 className="size-8 text-moss" aria-hidden="true" />
-          <h3 className="font-serif text-2xl text-moss">Thank you, {sent.name.split(' ')[0]}!</h3>
-          <p className="text-muted-foreground">Your enquiry has been sent. We will contact you on {sent.phone} soon.</p>
-          <div className="flex flex-wrap gap-3">
-            <a
-              href={whatsappUrl(whatsappText(sent))}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-lantern px-5 py-2.5 font-medium text-moss focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-moss"
-            >
-              <MessageCircle className="size-4" aria-hidden="true" />
-              Also send on WhatsApp
-            </a>
-            <button type="button" onClick={() => setStatus('idle')} className="rounded-full px-5 py-2.5 font-medium text-moss underline-offset-4 hover:underline">
-              Send another enquiry
-            </button>
-          </div>
-        </div>
-      ) : (
+      {(
         <form noValidate onSubmit={onSubmit} className="mt-10 grid gap-5 rounded-[2rem] border border-border bg-card p-6 sm:grid-cols-2 sm:p-8">
           <Field id="name" label="Full name" error={errors.name} className="sm:col-span-2">
             <input id="inq-name" name="name" autoComplete="name" value={values.name} onChange={update('name')} {...a11y('name', errors)} className={inputCls(errors.name)} />
@@ -103,6 +83,15 @@ export function InquiryForm() {
           </Field>
           <Field id="guests" label="Guests" error={errors.guests}>
             <input id="inq-guests" name="guests" type="number" min={1} max={30} inputMode="numeric" value={values.guests} onChange={update('guests')} {...a11y('guests', errors)} className={inputCls(errors.guests)} />
+          </Field>
+          <Field id="room" label="Room type" error={errors.room}>
+            <select id="inq-room" name="room" value={values.room} onChange={update('room')} className={inputCls(errors.room)}>
+              {site.rooms.map((r) => (
+                <option key={r.id} value={r.name}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
           </Field>
           <Field id="message" label="Message (optional)" error={errors.message} className="sm:col-span-2">
             <textarea id="inq-message" name="message" rows={4} value={values.message} onChange={update('message')} {...a11y('message', errors)} className={cn(inputCls(errors.message), 'resize-y')} />
@@ -131,9 +120,34 @@ export function InquiryForm() {
             disabled={status === 'loading'}
             className="inline-flex items-center justify-center gap-2 rounded-full bg-moss px-6 py-3.5 font-medium text-mist transition-colors hover:bg-moss/90 disabled:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:col-span-2"
           >
-            {status === 'loading' && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
-            {status === 'loading' ? 'Sending…' : 'Send enquiry'}
+            {status === 'loading' ? (
+              <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            ) : null}
+            {status === 'loading' ? 'Sending…' : 'Send Booking Request'}
+            {status !== 'loading' && <Send className="size-4" aria-hidden="true" />}
           </button>
+
+          <div role="status" aria-live="polite" className="sm:col-span-2 empty:hidden">
+            {status === 'success' && (
+              <div className="flex flex-col gap-3">
+                <p className="flex items-start gap-2 font-medium text-emerald-700">
+                  <CheckCircle2 className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
+                  Thank you! Your booking request has been sent. We will contact you soon.
+                </p>
+                {sent && (
+                  <a
+                    href={whatsappUrl(whatsappText(sent))}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex w-fit items-center gap-2 rounded-full bg-lantern px-4 py-2 text-sm font-medium text-moss"
+                  >
+                    <MessageCircle className="size-4" aria-hidden="true" />
+                    Confirm faster on WhatsApp
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
         </form>
       )}
     </section>

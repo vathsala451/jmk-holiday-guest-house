@@ -13,9 +13,9 @@ export function MobileActionBar() {
         <MessageCircle className="size-5" aria-hidden="true" />
         WhatsApp
       </a>
-      <a href="#enquire" className={`${base} bg-lantern text-moss`}>
+      <a href="#book" className={`${base} bg-lantern text-moss`}>
         <CalendarDays className="size-5" aria-hidden="true" />
-        Enquire
+        Book Stay
       </a>
     </nav>
   )

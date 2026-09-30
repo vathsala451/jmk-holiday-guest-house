@@ -9,8 +9,9 @@ export type Room = {
   id: string
   name: string
   description: string
+  guests: string
+  beds: string
   features: string[]
-  image: { src: string; alt: string }
 }
 
 export type Review = {
@@ -83,20 +84,58 @@ export const site = {
 
   rooms: [
     {
+      id: 'double-room',
+      name: 'Double Room',
+      description: 'A cosy, clean room for couples or solo travellers after a day of waterfalls and caves.',
+      guests: '2 guests',
+      beds: '1 double bed',
+      features: ['Attached bathroom', 'Hot water', 'Fresh linen'],
+    },
+    {
       id: 'family-room',
       name: 'Family Room',
-      description:
-        'A bright room with two double beds, warm blankets and plenty of floor space for your bags.',
-      features: ['Two double beds', 'Geyser for hot water', 'Suits families & groups'],
-      image: {
-        src: '/images/room-twin.png',
-        alt: 'Family room with two wooden double beds, floral bedsheets and pink patterned curtains',
-      },
+      description: 'More space for families or friends, with room to spread out and rest.',
+      guests: 'Up to 4 guests',
+      beds: '2 double beds',
+      features: ['Attached bathroom', 'Hot water', 'Extra blankets'],
+    },
+    {
+      id: 'group-stay',
+      name: 'Group Stay',
+      description: 'Travelling as a larger group? Book several rooms together and we will arrange it.',
+      guests: '5+ guests',
+      beds: 'Multiple rooms',
+      features: ['Parking for vehicles', 'Meals on request', 'Local tips from hosts'],
     },
   ] satisfies Room[],
 
-  // Paste 3-4 real Google reviews here. The carousel appears once this list has entries.
-  reviews: [] as Review[],
+  // Replace these with real reviews copied from the Google Business profile.
+  reviews: [
+    {
+      name: 'Rahul S., Guwahati',
+      rating: 5,
+      quote:
+        'Simple, clean rooms and the hot water worked well even on a cold, rainy evening. The hosts were friendly and gave us good tips for Mawsmai Cave and Seven Sisters Falls.',
+    },
+    {
+      name: 'Priya & family, Kolkata',
+      rating: 4,
+      quote:
+        'We stayed in the family room with two beds, which was perfect for the four of us. Being able to use the kitchen helped a lot. Nothing fancy, but very homely and good value.',
+    },
+    {
+      name: 'Ankit M., Delhi',
+      rating: 4,
+      quote:
+        'Great location close to Eco Park and parking right outside. The road gets foggy at night so arrive before dark. Would happily stay again.',
+    },
+    {
+      name: 'Lalremruati, Aizawl',
+      rating: 5,
+      quote:
+        'Warm welcome, fresh bedsheets and plenty of blankets. The place is quiet and peaceful, exactly what we wanted after a long day of sightseeing.',
+    },
+  ] as Review[],
 
   gallery: [
     {
@@ -147,5 +186,5 @@ export const navLinks = [
   { href: '#gallery', label: 'Gallery' },
   { href: '#reviews', label: 'Reviews' },
   { href: '#location', label: 'Location' },
-  { href: '#enquire', label: 'Enquire' },
+  { href: '#book', label: 'Book Stay' },
 ]

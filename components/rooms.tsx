@@ -1,6 +1,5 @@
-import Image from 'next/image'
-import { Check, MessageCircle } from 'lucide-react'
-import { site, whatsappUrl } from '@/data/site'
+import { BedDouble, Check, Users } from 'lucide-react'
+import { site } from '@/data/site'
 import { SectionHeading } from './section-heading'
 
 export function Rooms() {
@@ -10,39 +9,46 @@ export function Rooms() {
       <SectionHeading
         id="rooms-title"
         eyebrow="Rooms"
-        title="Room to rest together"
-        intro="Tariffs depend on dates and group size. Message us and we will share current rates."
+        title="Choose your stay"
+        intro="Call or send a booking request for current rates and availability."
       />
-      <div className="mt-10 flex flex-col gap-8">
+      <ul className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {site.rooms.map((room) => (
-          <article key={room.id} className="grid overflow-hidden rounded-[2rem] border border-border bg-card md:grid-cols-2">
-            <div className="relative aspect-[4/3] md:aspect-auto md:min-h-80">
-              <Image src={room.image.src} alt={room.image.alt} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
-            </div>
-            <div className="flex flex-col justify-center gap-5 p-6 sm:p-10">
-              <h3 className="font-serif text-3xl text-moss">{room.name}</h3>
+          <li key={room.id} className="flex flex-col gap-5 rounded-[2rem] border border-border bg-card p-7 shadow-sm">
+            <span className="flex size-14 items-center justify-center rounded-full bg-lantern/20 text-moss">
+              <BedDouble className="size-6" aria-hidden="true" />
+            </span>
+            <div className="flex flex-col gap-2">
+              <h3 className="font-serif text-2xl font-semibold text-moss">{room.name}</h3>
               <p className="leading-relaxed text-muted-foreground">{room.description}</p>
-              <ul className="flex flex-col gap-2">
-                {room.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-moss">
-                    <Check className="size-4 text-lantern" aria-hidden="true" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <a
-                href={whatsappUrl(`Hi ${site.name}, I'd like to know the rates for the ${room.name}.`)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex w-fit items-center gap-2 rounded-full bg-moss px-5 py-2.5 text-sm font-medium text-mist transition-colors hover:bg-moss/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-              >
-                <MessageCircle className="size-4" aria-hidden="true" />
-                Ask for rates
-              </a>
             </div>
-          </article>
+            <div className="flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5 text-sm text-moss">
+                <Users className="size-4" aria-hidden="true" />
+                {room.guests}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5 text-sm text-moss">
+                <BedDouble className="size-4" aria-hidden="true" />
+                {room.beds}
+              </span>
+            </div>
+            <ul className="flex flex-col gap-2.5">
+              {room.features.map((f) => (
+                <li key={f} className="flex items-center gap-2.5 text-moss/90">
+                  <Check className="size-4 text-moss/70" aria-hidden="true" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <a
+              href="#book"
+              className="mt-auto inline-flex items-center justify-center rounded-full bg-moss px-6 py-3.5 font-semibold text-mist transition-colors hover:bg-moss/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              Book this room
+            </a>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   )
 }

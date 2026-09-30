@@ -109,8 +109,8 @@ export function HeroMist() {
         <div className="relative">
           <div ref={frameRef} className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-2xl shadow-moss/20">
             <Image
-              src="/images/exterior-night.png"
-              alt="JMK Holiday Guest House at night, lit with strings of blue and warm lights"
+              src="/images/hero-sohra.png"
+              alt="Green Khasi hills and waterfalls in Sohra at sunrise, with mist drifting through the valley"
               fill
               priority
               sizes="(min-width: 1024px) 560px, 100vw"
