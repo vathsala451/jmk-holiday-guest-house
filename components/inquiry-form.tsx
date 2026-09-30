@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, Loader2, MessageCircle, AlertCircle, Send } from 'lucide-react'
+import { CheckCircle2, MessageCircle, AlertCircle } from 'lucide-react'
 import { inquiryToText, validateInquiry, type InquiryErrors, type InquiryInput } from '@/lib/inquiry'
 import { site, whatsappUrl } from '@/data/site'
 import { cn } from '@/lib/utils'
@@ -26,7 +26,7 @@ export function InquiryForm() {
 
   const whatsappText = (v: InquiryInput) => `Hi ${site.name}, I'd like to enquire about a stay.\n\n${inquiryToText(v)}`
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const found = validateInquiry(values)
     setErrors(found)
@@ -35,27 +35,14 @@ export function InquiryForm() {
       document.getElementById(`inq-${first}`)?.focus()
       return
     }
-    setStatus('loading')
-    try {
-      const res = await fetch('/api/inquiry', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        if (data.errors) setErrors(data.errors)
-        setServerMessage(data.error ?? 'Something went wrong. Please try WhatsApp.')
-        setStatus('error')
-        return
-      }
-      setSent(data.delivered ? null : values)
-      setValues(empty)
-      setStatus('success')
-    } catch {
-      setServerMessage('Network error. Please check your connection or use WhatsApp.')
-      setStatus('error')
+    const url = whatsappUrl(whatsappText(values))
+    const popup = window.open(url, '_blank', 'noopener,noreferrer')
+    if (!popup && window.self === window.top) {
+      window.location.href = url
     }
+    setSent(values)
+    setValues(empty)
+    setStatus('success')
   }
 
   return (
@@ -120,11 +107,8 @@ export function InquiryForm() {
             disabled={status === 'loading'}
             className="inline-flex items-center justify-center gap-2 rounded-full bg-moss px-6 py-3.5 font-medium text-mist transition-colors hover:bg-moss/90 disabled:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:col-span-2"
           >
-            {status === 'loading' ? (
-              <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-            ) : null}
-            {status === 'loading' ? 'Sending…' : 'Send Booking Request'}
-            {status !== 'loading' && <Send className="size-4" aria-hidden="true" />}
+            <MessageCircle className="size-4" aria-hidden="true" />
+            Send Booking Request on WhatsApp
           </button>
 
           <div role="status" aria-live="polite" className="sm:col-span-2 empty:hidden">
@@ -132,7 +116,7 @@ export function InquiryForm() {
               <div className="flex flex-col gap-3">
                 <p className="flex items-start gap-2 font-medium text-emerald-700">
                   <CheckCircle2 className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
-                  Thank you! Your booking request has been sent. We will contact you soon.
+                  Thank you! Your booking request is ready in WhatsApp. Press send there and we will contact you soon.
                 </p>
                 {sent && (
                   <a
@@ -142,7 +126,7 @@ export function InquiryForm() {
                     className="inline-flex w-fit items-center gap-2 rounded-full bg-lantern px-4 py-2 text-sm font-medium text-moss"
                   >
                     <MessageCircle className="size-4" aria-hidden="true" />
-                    Confirm faster on WhatsApp
+                    {"WhatsApp didn't open? Tap here"}
                   </a>
                 )}
               </div>
